@@ -1,0 +1,43 @@
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: localadventures-app
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      PORT: 3977
+      IP_SERVER: localhost
+      DB_HOST: mongodb:27017
+      DB_NAME: adventures
+      DB_USER: root
+      DB_PASS: example
+      DB_AUTH_SOURCE: admin
+    ports:
+      - "3977:3977"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: dockerFile
+    container_name: localadventures-nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "8080:80"
