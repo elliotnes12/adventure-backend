@@ -6,8 +6,6 @@ const dbName = process.env.DB_NAME || "";
 const dbUser = process.env.DB_USER || "";
 const dbPass = process.env.DB_PASS || "";
 
-
-
 let dbUriFromParts = "";
 
 if(dbHost === "localhost:27017") {
