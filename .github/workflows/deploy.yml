@@ -2,7 +2,7 @@ name: CI/CD Adventure Backend
 
 on:
   push:
-    branches: [ "main" ] # Se dispara al unir cambios a main
+    branches: [ "master" ] # Se dispara al unir cambios a main
 
 env:
   PROJECT_ID: curso-485418
