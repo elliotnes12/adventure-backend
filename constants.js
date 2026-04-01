@@ -1,4 +1,4 @@
-export const PORT = Number(process.env.PORT) || 3977;
+export const PORT = Number(process.env.PORT) || 4000;
 export const IP_SERVER = process.env.IP_SERVER || "localhost";
 
 const dbHost = process.env.DB_HOST || "localhost:27017";

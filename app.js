@@ -15,6 +15,14 @@ const app = express();
 const server = http.createServer(app);
 app.use(express.json());
 
+app.use(cors({
+    origin: '*', // Permite peticiones desde cualquier lugar (incluyendo tu IP 34.70.191.84)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.set('trust proxy', true);
+
 
 app.use(express.urlencoded({ extended: true }));
 

@@ -10,6 +10,6 @@ RUN chown -R node:node /usr/src/app
 
 USER node
 
-EXPOSE 3977
+EXPOSE 4000
 
 CMD ["npm", "start"]

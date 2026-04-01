@@ -1,0 +1,54 @@
+name: CI/CD Adventure Backend
+
+on:
+  push:
+    branches: [ "main" ] # Se dispara al unir cambios a main
+
+env:
+  PROJECT_ID: curso-485418
+  GKE_CLUSTER: adventure-cluster
+  GKE_ZONE: us-central1
+  IMAGE_NAME: adventure-app # Nombre de tu imagen en el Registry
+  REGISTRY_URL: us-central1-docker.pkg.dev/curso-485418/repo-adventure
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 1. Autenticación con el JSON de la Service Account
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+    # 2. Configurar Docker para hablar con Google
+    - name: Configure Docker
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    # 3. Build de la imagen usando el ID del Commit como versión
+    - name: Build Docker Image
+      run: |
+        docker build -t $REGISTRY_URL/$IMAGE_NAME:${{ github.sha }} .
+
+    # 4. Push al Artifact Registry
+    - name: Push Image
+      run: docker push $REGISTRY_URL/$IMAGE_NAME:${{ github.sha }}
+
+    # 5. Conectar con el Cluster de K8s
+    - name: Get GKE Credentials
+      uses: 'google-github-actions/get-gke-credentials@v1'
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.GKE_ZONE }}
+
+    # 6. ACTUALIZACIÓN AUTOMÁTICA (El momento de la verdad)
+    - name: Deploy to K8s
+      run: |
+        kubectl set image deployment/adventure-app \
+          localadventures-app-1=$REGISTRY_URL/$IMAGE_NAME:${{ github.sha }}
+        
+        # Esperar a que el despliegue sea exitoso
+        kubectl rollout status deployment/adventure-app
